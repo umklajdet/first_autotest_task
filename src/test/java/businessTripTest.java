@@ -10,7 +10,11 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Wait;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.concurrent.TimeUnit;
+
+import static org.openqa.selenium.Keys.TAB;
 
 public class businessTripTest {
     private WebDriver driver;
@@ -57,29 +61,36 @@ public class businessTripTest {
         driver.findElement(By.xpath("//div/a/span[contains(@class, 'select2-chosen')]")).click();
         driver.findElement(By.xpath("//li/div[text()='(Хром) Призрачная Организация Охотников']")).click();
         driver.findElement(By.xpath("//label[text()='Заказ билетов']/../input")).click();
-        // поверить что чекбокс установлен (?)
-        //Assert.assertTrue(ExpectedConditions.elementToBeSelected(By.xpath("//label[text()='Заказ билетов']/../input")));
         // города
+        driver.findElement(By.xpath("//input[contains(@data-name, 'departure-city')]")).clear();
+        driver.findElement(By.xpath("//input[contains(@data-name, 'departure-city')]")).sendKeys("Россия, Сочи");
         driver.findElement(By.xpath("//input[contains(@data-name, 'arrival-city')]")).sendKeys("Россия, Анадырь");
-        // проверяем что город отправления заполнен по умолчанию
-        String departureCity = driver.findElement(By.xpath("//input[contains(@data-name, 'departure-city')]")).getAttribute("value");
-        Assert.assertNotEquals("Поле пустое", "", departureCity);
         //даты
-        WebElement departureDate = driver.findElement(By.xpath("//input[contains(@id, 'departureDatePlan')]"));
-        WebElement returnDate = driver.findElement(By.xpath("//input[contains(@id, 'returnDatePlan')]"));
-        departureDate.click();
-        departureDate.sendKeys("25.04.2022");
-        returnDate.click();
-        returnDate.sendKeys("01.05.2022");
+        WebElement departureDate = driver.findElement(By.xpath("//input[contains(@name, 'date_selector_crm_business_trip_departureDatePlan')]"));
+        WebElement returnDate = driver.findElement(By.xpath("//input[contains(@name, 'date_selector_crm_business_trip_returnDatePlan')]"));
+        Date today = new Date();
+        SimpleDateFormat formatter = new SimpleDateFormat("dd.MM.yyyy");
+        String departureDateStr = formatter.format(today.getTime() + 7 * 24 * 3600 * 1000);
+        String returnDateStr = formatter.format(today.getTime() + 15 * 24 * 3600 * 1000);
+        departureDate.sendKeys(departureDateStr);
+        returnDate.sendKeys(returnDateStr);
+        returnDate.sendKeys(TAB);
 
-
-
-
-
-
+        // проверяем введенные данные
+        checkValues(By.xpath("//option[text()='Отдел внутренней разработки']"), "Отдел внутренней разработки");
+        checkValues(By.xpath("//input[@name='crm_business_trip[company]']"), "(Хром) Призрачная Организация Охотников");
+        checkValues(By.xpath("//input[contains(@data-name, 'departure-city')]"), "Россия, Сочи");
+        checkValues(By.xpath("//input[contains(@data-name, 'arrival-city')]"), "Россия, Анадырь");
+        checkValues(By.xpath("//input[contains(@name, 'date_selector_crm_business_trip_departureDatePlan')]"), departureDateStr);
+        checkValues(By.xpath("//input[contains(@name, 'date_selector_crm_business_trip_returnDatePlan')]"), returnDateStr);
+        Assert.assertTrue(driver.findElement(By.xpath("//label[text()='Заказ билетов']/../input")).isEnabled());
 
         // подождем перед закрытием браузера
         Thread.sleep(5000);
+    }
+
+    public void checkValues(By locator, String checkStr) {
+        Assert.assertEquals(driver.findElement(locator).getText(), checkStr);
     }
 
     @After
