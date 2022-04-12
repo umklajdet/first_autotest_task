@@ -15,6 +15,7 @@ import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
 import static org.openqa.selenium.Keys.TAB;
+import static org.openqa.selenium.Keys.valueOf;
 
 public class businessTripTest {
     private WebDriver driver;
@@ -63,8 +64,8 @@ public class businessTripTest {
         driver.findElement(By.xpath("//label[text()='Заказ билетов']/../input")).click();
         // города
         driver.findElement(By.xpath("//input[contains(@data-name, 'departure-city')]")).clear();
-        driver.findElement(By.xpath("//input[contains(@data-name, 'departure-city')]")).sendKeys("Россия, Сочи");
-        driver.findElement(By.xpath("//input[contains(@data-name, 'arrival-city')]")).sendKeys("Россия, Анадырь");
+        driver.findElement(By.xpath("//input[contains(@data-name, 'departure-city')]")).sendKeys("Россия, Красногорск");
+        driver.findElement(By.xpath("//input[contains(@data-name, 'arrival-city')]")).sendKeys("Венгрия, Будапешт");
         //даты
         WebElement departureDate = driver.findElement(By.xpath("//input[contains(@name, 'date_selector_crm_business_trip_departureDatePlan')]"));
         WebElement returnDate = driver.findElement(By.xpath("//input[contains(@name, 'date_selector_crm_business_trip_returnDatePlan')]"));
@@ -77,21 +78,28 @@ public class businessTripTest {
         returnDate.sendKeys(TAB);
 
         // проверяем введенные данные
-        checkValues(By.xpath("//option[text()='Отдел внутренней разработки']"), "Отдел внутренней разработки");
-        checkValues(By.xpath("//input[@name='crm_business_trip[company]']"), "(Хром) Призрачная Организация Охотников");
-        checkValues(By.xpath("//input[contains(@data-name, 'departure-city')]"), "Россия, Сочи");
-        checkValues(By.xpath("//input[contains(@data-name, 'arrival-city')]"), "Россия, Анадырь");
-        checkValues(By.xpath("//input[contains(@name, 'date_selector_crm_business_trip_departureDatePlan')]"), departureDateStr);
-        checkValues(By.xpath("//input[contains(@name, 'date_selector_crm_business_trip_returnDatePlan')]"), returnDateStr);
-        Assert.assertTrue(driver.findElement(By.xpath("//label[text()='Заказ билетов']/../input")).isEnabled());
+        Assert.assertEquals("Отдел внутренней разработки", driver.findElement(By.xpath("//div[contains(@id, 'business_trip_businessUnit')]/span")).getText());
+        Assert.assertEquals("(Хром) Призрачная Организация Охотников", driver.findElement(By.xpath("//span[@class='select2-chosen']")).getText());
+        //Assert.assertTrue(driver.findElement(By.xpath("//label[text()='Заказ билетов']/../input")).isSelected());
+        Assert.assertTrue(driver.findElement(By.cssSelector("input[value='1']")).isSelected());
+        // остальные пооверки успешны
+        Assert.assertEquals("Россия, Красногорск", driver.findElement(By.xpath("//input[contains(@data-name, 'departure-city')]")).getAttribute("value"));
+        Assert.assertEquals("Венгрия, Будапешт", driver.findElement(By.xpath("//input[contains(@data-name, 'arrival-city')]")).getAttribute("value"));
+        Assert.assertEquals(departureDateStr, departureDate.getAttribute("value"));
+        Assert.assertEquals(returnDateStr, returnDate.getAttribute("value"));
 
-        // подождем перед закрытием браузера
+        // пытаемся сохранить введенные данные
+        driver.findElement(By.xpath("//button[contains(text(), 'Сохранить и закрыть')]")).click();
+
+        // проверяем сообщение об ошибке о сотрудниках
+        String errorMessage = "Список командируемых сотрудников не может быть пустым";
+        Assert.assertEquals(errorMessage, driver.findElement(By.xpath("//span[text()='Командированные сотрудники']/../../div/div/span")).getText());
+        Assert.assertEquals(errorMessage, driver.findElement(By.xpath("//span[text()='Внештатные сотрудники']/../../div/div/span")).getText());
+
+        // подождем перед закрытием браузера, чтобы увидеть ошибки
         Thread.sleep(5000);
     }
 
-    public void checkValues(By locator, String checkStr) {
-        Assert.assertEquals(driver.findElement(locator).getText(), checkStr);
-    }
 
     @After
     public void afterTest(){
