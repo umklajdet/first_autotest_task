@@ -6,7 +6,6 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Wait;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
@@ -14,15 +13,16 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.openqa.selenium.Keys.TAB;
-import static org.openqa.selenium.Keys.valueOf;
 
-public class businessTripTest {
+public class BusinessTripTest {
     private WebDriver driver;
     Wait<WebDriver> wait;
 
     @Before
-    public void beforeTest(){
+    public void beforeTest() {
         System.setProperty("webdriver.chrome.driver", "src/test/resources/chromedriver.exe");
         driver = new ChromeDriver();
         String startUrl = "http://training.appline.ru/user/login";
@@ -34,7 +34,7 @@ public class businessTripTest {
     }
 
     @Test
-    public void createBusinessTripTest() throws InterruptedException{
+    public void createBusinessTripTest() throws InterruptedException {
 
         // Вводим логин/пароль, нажимаем Войти
         //driver.findElement(By.id("prependedInput")).click();
@@ -44,7 +44,7 @@ public class businessTripTest {
         driver.findElement(By.id("_submit")).click();
 
         // Проверяем наличие заголовка "Панель быстрого запуска"
-        Assert.assertEquals("Панель быстрого запуска", driver.findElement(By.xpath("//h1[contains(@class, 'oro-subtitle')]")).getText());
+        assertEquals("Панель быстрого запуска", driver.findElement(By.xpath("//h1[contains(@class, 'oro-subtitle')]")).getText());
 
         // Выбираем Расходы - Командировки
         driver.findElement(By.xpath("//span[@class='title'][text()='Расходы']")).click();
@@ -53,7 +53,7 @@ public class businessTripTest {
 
         // Нажимаем кнопку, проверяем наличие заголовка "Создать командировку"
         driver.findElement(By.xpath("//a[contains(@class,'btn back icons-holder-text')]")).click();
-        Assert.assertEquals("Создать командировку", driver.findElement(By.xpath("//h1[@class='user-name']")).getText());
+        assertEquals("Создать командировку", driver.findElement(By.xpath("//h1[@class='user-name']")).getText());
 
         // заполяем форму командировки
         driver.findElement(By.xpath("//select/option[text()='Выберите подразделение']")).click();
@@ -78,31 +78,29 @@ public class businessTripTest {
         returnDate.sendKeys(TAB);
 
         // проверяем введенные данные
-        Assert.assertEquals("Отдел внутренней разработки", driver.findElement(By.xpath("//div[contains(@id, 'business_trip_businessUnit')]/span")).getText());
-        Assert.assertEquals("(Хром) Призрачная Организация Охотников", driver.findElement(By.xpath("//span[@class='select2-chosen']")).getText());
+        assertEquals("Отдел внутренней разработки", driver.findElement(By.xpath("//div[contains(@id, 'business_trip_businessUnit')]/span")).getText());
+        assertEquals("(Хром) Призрачная Организация Охотников", driver.findElement(By.xpath("//span[@class='select2-chosen']")).getText());
         //Assert.assertTrue(driver.findElement(By.xpath("//label[text()='Заказ билетов']/../input")).isSelected());
-        Assert.assertTrue(driver.findElement(By.cssSelector("input[value='1']")).isSelected());
-        // остальные пооверки успешны
-        Assert.assertEquals("Россия, Красногорск", driver.findElement(By.xpath("//input[contains(@data-name, 'departure-city')]")).getAttribute("value"));
-        Assert.assertEquals("Венгрия, Будапешт", driver.findElement(By.xpath("//input[contains(@data-name, 'arrival-city')]")).getAttribute("value"));
-        Assert.assertEquals(departureDateStr, departureDate.getAttribute("value"));
-        Assert.assertEquals(returnDateStr, returnDate.getAttribute("value"));
+        assertTrue(driver.findElement(By.cssSelector("input[value='1']")).isSelected());
+        assertEquals("Россия, Красногорск", driver.findElement(By.xpath("//input[contains(@data-name, 'departure-city')]")).getAttribute("value"));
+        assertEquals("Венгрия, Будапешт", driver.findElement(By.xpath("//input[contains(@data-name, 'arrival-city')]")).getAttribute("value"));
+        assertEquals(departureDateStr, departureDate.getAttribute("value"));
+        assertEquals(returnDateStr, returnDate.getAttribute("value"));
 
         // пытаемся сохранить введенные данные
         driver.findElement(By.xpath("//button[contains(text(), 'Сохранить и закрыть')]")).click();
 
         // проверяем сообщение об ошибке о сотрудниках
         String errorMessage = "Список командируемых сотрудников не может быть пустым";
-        Assert.assertEquals(errorMessage, driver.findElement(By.xpath("//span[text()='Командированные сотрудники']/../../div/div/span")).getText());
-        Assert.assertEquals(errorMessage, driver.findElement(By.xpath("//span[text()='Внештатные сотрудники']/../../div/div/span")).getText());
+        assertEquals(errorMessage, driver.findElement(By.xpath("//span[text()='Командированные сотрудники']/../../div/div/span")).getText());
+        assertEquals(errorMessage, driver.findElement(By.xpath("//span[text()='Внештатные сотрудники']/../../div/div/span")).getText());
 
         // подождем перед закрытием браузера, чтобы увидеть ошибки
         Thread.sleep(5000);
     }
 
-
     @After
-    public void afterTest(){
+    public void afterTest() {
         driver.quit();
     }
 }
