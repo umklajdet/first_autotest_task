@@ -1,5 +1,4 @@
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.openqa.selenium.By;
@@ -9,8 +8,8 @@ import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.support.ui.Wait;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.concurrent.TimeUnit;
 
 import static org.junit.Assert.assertEquals;
@@ -69,13 +68,13 @@ public class BusinessTripTest {
         //даты
         WebElement departureDate = driver.findElement(By.xpath("//input[contains(@name, 'date_selector_crm_business_trip_departureDatePlan')]"));
         WebElement returnDate = driver.findElement(By.xpath("//input[contains(@name, 'date_selector_crm_business_trip_returnDatePlan')]"));
-        Date today = new Date();
-        SimpleDateFormat formatter = new SimpleDateFormat("dd.MM.yyyy");
-        String departureDateStr = formatter.format(today.getTime() + 7 * 24 * 3600 * 1000);
-        String returnDateStr = formatter.format(today.getTime() + 15 * 24 * 3600 * 1000);
+        LocalDate today = LocalDate.now();
+        String departureDateStr = today.plusDays(7).format(DateTimeFormatter.ofPattern("dd.MM.yyyy"));
+        String returnDateStr = today.plusDays(15).format(DateTimeFormatter.ofPattern("dd.MM.yyyy"));
         departureDate.sendKeys(departureDateStr);
         returnDate.sendKeys(returnDateStr);
         returnDate.sendKeys(TAB);
+
 
         // проверяем введенные данные
         assertEquals("Отдел внутренней разработки", driver.findElement(By.xpath("//div[contains(@id, 'business_trip_businessUnit')]/span")).getText());
