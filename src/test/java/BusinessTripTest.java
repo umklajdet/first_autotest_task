@@ -36,9 +36,7 @@ public class BusinessTripTest {
     public void createBusinessTripTest() throws InterruptedException {
 
         // Вводим логин/пароль, нажимаем Войти
-        //driver.findElement(By.id("prependedInput")).click();
         driver.findElement(By.id("prependedInput")).sendKeys("Taraskina Valeriya");
-        //driver.findElement(By.id("prependedInput2")).click();
         driver.findElement(By.id("prependedInput2")).sendKeys("testing");
         driver.findElement(By.id("_submit")).click();
 
