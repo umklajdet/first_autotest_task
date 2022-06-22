@@ -1,0 +1,21 @@
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.FindBy;
+
+public class LoginPage extends BasePage {
+
+    @FindBy(id = "prependedInput")
+    private WebElement loginInput;
+
+    @FindBy(id = "prependedInput2")
+    private WebElement passwordInput;
+
+    @FindBy(id = "_submit")
+    private WebElement submitButton;
+
+    public void logIn(String login, String password){
+        loginInput.sendKeys(login);
+        passwordInput.sendKeys(password);
+        submitButton.click();
+    }
+
+}
