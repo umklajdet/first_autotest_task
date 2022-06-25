@@ -20,5 +20,4 @@ public class LoginPage extends BasePage {
         submitButton.click();
         return pageManager.getStartPage();
     }
-
 }

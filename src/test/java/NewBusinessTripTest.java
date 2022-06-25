@@ -30,7 +30,7 @@ public class NewBusinessTripTest extends BaseTests {
                 .clickSaveAndClose()
                 .checkErrorMessage("Список командируемых сотрудников не может быть пустым");
 
-         // подождем перед закрытием браузера, чтобы увидеть ошибки
+        // подождем перед закрытием браузера, чтобы увидеть ошибки
         Thread.sleep(5000);
     }
 }
