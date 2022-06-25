@@ -1,7 +1,7 @@
 package pages;
 
 import org.junit.Assert;
-import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
@@ -10,6 +10,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class CreateBusinessTripPage extends BasePage {
 
@@ -46,6 +47,25 @@ public class CreateBusinessTripPage extends BasePage {
     @FindBy(xpath = "//input[contains(@name, 'date_selector_crm_business_trip_returnDatePlan')]")
     private WebElement returnDate;
 
+    @FindBy(xpath = "//div[@id='oro-dropdown-mask']")
+    private WebElement pageFocus;
+
+    @FindBy(xpath = "//div[contains(@id, 'business_trip_businessUnit')]/span")
+    private WebElement selectedDepartment;
+
+    @FindBy(xpath = "//span[@class='select2-chosen']")
+    private WebElement selectedOrg;
+
+    @FindBy(xpath = "//button[contains(text(), 'Сохранить и закрыть')]")
+    private WebElement saveButton;
+
+    @FindBy(xpath = "//span[text()='Командированные сотрудники']/../../div/div/span")
+    private WebElement employeeList;
+
+    @FindBy(xpath = "//span[text()='Внештатные сотрудники']/../../div/div/span")
+    private WebElement outsourceEmployeeList;
+
+    private WebElement elementForCheck = null;
 
     // проверяет заголовок страницы
     public CreateBusinessTripPage checkPageTitle(String expectedTitle) {
@@ -103,6 +123,7 @@ public class CreateBusinessTripPage extends BasePage {
     public CreateBusinessTripPage inputCities(String departureCityTitle, String arrivalCityTitle) {
         departureCity.clear();
         departureCity.sendKeys(departureCityTitle);
+        arrivalCity.clear();
         arrivalCity.sendKeys(arrivalCityTitle);
         return this;
     }
@@ -118,25 +139,81 @@ public class CreateBusinessTripPage extends BasePage {
     }
 
     public CreateBusinessTripPage focusToPage() {
-        pageTitle.click();
+        pageFocus.click();
         return this;
     }
 
 
-    // проверки заполнения полей - непонятно как делать
-    public void checkSelectedFromListData(String expectedValue, WebElement element) {
+    // проверки заполнения полей (Значения, выбранные из выпадающего списка)
+    public CreateBusinessTripPage checkSelectedData(String dataName, String expectedValue) {
+        LocalDate today = LocalDate.now();
+        switch (dataName) {
+            case "Подразделение":
+                elementForCheck = selectedDepartment;
+                break;
+            case "Организация":
+                elementForCheck = selectedOrg;
+                break;
+            default:
+                Assert.fail("Поле " + dataName + " отсутствует на странице или действие для него не задано");
+        }
         assertEquals("Значение не сответвует ожидаемому",
                 expectedValue,
-                element.getText());
+                elementForCheck.getText());
+        return this;
     }
 
-    public void checkFilledData(String expectedValue, WebElement element) {
+    // проверки заполнения полей (Значения, введенные с клавиатуры)
+    public CreateBusinessTripPage CheckEnteredData(String dataName, String expectedValue) {
+        LocalDate today = LocalDate.now();
+        switch (dataName) {
+            case "Город выезда":
+                elementForCheck = departureCity;
+                break;
+            case "Город прибытия":
+                elementForCheck = arrivalCity;
+                break;
+            case "Дата выезда":
+                elementForCheck = arrivalDate;
+                expectedValue = today.plusDays(Integer.parseInt(expectedValue)).format(DateTimeFormatter.ofPattern("dd.MM.yyyy"));
+                break;
+            case "Дата возвращения":
+                elementForCheck = returnDate;
+                expectedValue = today.plusDays(Integer.parseInt(expectedValue)).format(DateTimeFormatter.ofPattern("dd.MM.yyyy"));
+                break;
+            default:
+                Assert.fail("Поле " + dataName + " отсутствует на странице или действие для него не задано");
+        }
         assertEquals("Значение не сответвует ожидаемому",
                 expectedValue,
-                element.getAttribute("value"));
+                elementForCheck.getAttribute("value"));
+        return this;
     }
 
-    public void checkSelectedCheckBox(){
+    // проверки заполнения полей (Выбранные чекбоксы)
+    public CreateBusinessTripPage CheckSelectedCheckboxData(String dataName) {
+        for (WebElement task : tasksList) {
+            if (task.getText().contains(dataName)) {
+                elementForCheck = task.findElement(By.xpath("../input"));
+                assertTrue("Чекбокс не выбран", elementForCheck.isSelected());
+                return this;
+            }
+        }
+        Assert.fail("Чекбокс " + dataName + " отсутствует на странице или действие для него не задано");
+        return this;
+    }
 
+    public CreateBusinessTripPage clickSaveAndClose() {
+        saveButton.click();
+        return this;
+    }
+
+    public void checkErrorMessage(String expectedValue) {
+        assertEquals("Значение не сответвует ожидаемому",
+                expectedValue,
+                employeeList.getText());
+        assertEquals("Значение не сответвует ожидаемому",
+                expectedValue,
+                outsourceEmployeeList.getText());
     }
 }

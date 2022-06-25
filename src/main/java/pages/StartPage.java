@@ -27,7 +27,6 @@ public class StartPage extends BasePage {
     }
 
     public StartPage selectMainMenuElement(String elementName) {
-        // реализовать iterator или listIterator вместо for?
         for (WebElement menuElement : mainMenuElements) {
             if (menuElement.getText().contains(elementName)) {
                 menuElement.click();
