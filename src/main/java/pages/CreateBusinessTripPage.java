@@ -195,7 +195,7 @@ public class CreateBusinessTripPage extends BasePage {
         for (WebElement task : tasksList) {
             if (task.getText().contains(dataName)) {
                 elementForCheck = task.findElement(By.xpath("../input"));
-                assertTrue("Чекбокс не выбран", elementForCheck.isSelected());
+                assertTrue("Чекбокс " + dataName + " не выбран", elementForCheck.isSelected());
                 return this;
             }
         }

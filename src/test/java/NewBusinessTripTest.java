@@ -27,6 +27,7 @@ public class NewBusinessTripTest extends BaseTests {
                 .CheckEnteredData("Город прибытия", "Венгрия, Будапешт")
                 .CheckEnteredData("Дата выезда", String.valueOf(7))
                 .CheckEnteredData("Дата возвращения", String.valueOf(15))
+                .CheckSelectedCheckboxData("Заказ билетов")
                 .clickSaveAndClose()
                 .checkErrorMessage("Список командируемых сотрудников не может быть пустым");
 
